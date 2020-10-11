@@ -1,4 +1,4 @@
-FROM alpine
+FROM golang
 LABEL Name="autoheal" 
 RUN go build main.go
 COPY ./autoheal /usr/local/bin/
