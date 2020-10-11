@@ -21,7 +21,7 @@ func work(host string, action string) {
 	// server by using an unencrypted PEM-encoded private key file.
 	// If you have an encrypted private key, the crypto/x509 package
 	// can be used to decrypt it.
-	key, err := ioutil.ReadFile("/home/sea/.ssh/rhce")
+	key, err := ioutil.ReadFile(".ssh/key")
 	if err != nil {
 		log.Fatalf("Remote action: unable to read private key: %v", err)
 	}
@@ -72,14 +72,15 @@ func work(host string, action string) {
 func handler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "Hello from a AutoHeal\n")
 	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close() // важный пункт!
+	defer r.Body.Close()
+
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 	var grafanaAlert map[string]interface{}
 	json.Unmarshal(body, &grafanaAlert)
-	//fmt.Printf("unpacked in empty interface:\n%#v\n\n", grafanaAlert)
+
 	msg := grafanaAlert["message"].(string)
 	rule := grafanaAlert["ruleName"].(string)
 	state := grafanaAlert["state"].(string)
