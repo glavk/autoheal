@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"golang.org/x/crypto/ssh"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // server key
@@ -89,11 +90,56 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	go work(msg, rule)
 }
 
+type healer struct {
+	Server healerSrv `yaml:"server"`
+}
+
+type healerSrv struct {
+	Addr string `yaml:"addr"`
+	Port string `yaml:"port"`
+}
+
+type service struct {
+	SSHEntries []sshEntry `yaml:"service"`
+}
+
+type sshEntry struct {
+	Name    string `yaml:"name"`
+	Command sshCmd `yaml:"command"`
+}
+
+type sshCmd struct {
+	Addr string `yaml:"addr"`
+	Port int    `yaml:"port"`
+	Cmd  string `yaml:"exe"`
+}
+
 func main() {
 	var config healer
+	var cfg service
+
+	configFile, err := ioutil.ReadFile("config.yml")
+	if err != nil {
+		log.Fatal("Error open config file ", err)
+	}
+
+	err = yaml.Unmarshal(configFile, &cfg)
+	if err != nil {
+		log.Fatalf("cannot unmarshal data: %v", err)
+	}
+	// do some work with cfg
+
+	err = yaml.Unmarshal(configFile, &config)
+	if err != nil {
+		log.Fatalf("cannot unmarshal data: %v", err)
+	}
+	addr := config.Server.Addr
+	port := config.Server.Port
+
 	http.HandleFunc("/", handler)
 
-	if err := http.ListenAndServe(":9999", nil); err != nil {
+	if err := http.ListenAndServe(addr+":"+port, nil); err != nil {
 		log.Fatal("Server start failed..." + err.Error())
 	}
+
 }

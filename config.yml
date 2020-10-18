@@ -1,0 +1,14 @@
+---
+server:
+  addr: localhost
+  port: 9999
+
+service:
+  - name: service1
+    command:
+     addr: server1
+     port: 222
+     exe: service restart name
+
+ssh: privateKey
+---
