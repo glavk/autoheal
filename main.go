@@ -90,6 +90,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	var config healer
 	http.HandleFunc("/", handler)
 
 	if err := http.ListenAndServe(":9999", nil); err != nil {
